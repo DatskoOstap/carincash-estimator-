@@ -1,0 +1,422 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:var(--color-background-primary);--bg2:var(--color-background-secondary);--bg3:var(--color-background-tertiary);--border:var(--color-border-tertiary);--border2:var(--color-border-secondary);--text:var(--color-text-primary);--text2:var(--color-text-secondary);--text3:var(--color-text-tertiary);--accent:#D85A30;--accent2:#BA7517;--blue:#185FA5;--green:#3B6D11;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;min-height:100vh}
+.app{padding:14px 14px 40px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.title{font-size:16px;font-weight:600;letter-spacing:-.02em;color:var(--text)}
+.title span{color:var(--accent);font-family:var(--mono)}
+.updated{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.prices{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:8px;margin-bottom:12px;align-items:stretch}
+.price-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.price-metal{font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.price-oz{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.price-g{font-size:18px;font-weight:600;font-family:var(--mono);color:var(--text)}
+.price-g span{font-size:11px;font-weight:400;color:var(--text2)}
+.btn-refresh{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:0 14px;cursor:pointer;font-family:var(--sans);font-size:12px;color:var(--text);white-space:nowrap;display:flex;align-items:center;gap:6px;transition:all .15s}
+.btn-refresh:hover{border-color:var(--accent);color:var(--accent)}
+.btn-refresh.loading{opacity:.6;pointer-events:none}
+.toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:180px}
+.search-wrap input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px 8px 32px;font-family:var(--sans);font-size:13px;color:var(--text);outline:none;transition:border .15s}
+.search-wrap input:focus{border-color:var(--blue)}
+.search-wrap input::placeholder{color:var(--text3)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px}
+.btn-add{background:var(--accent);border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-family:var(--sans);font-size:13px;color:#fff;font-weight:500;display:flex;align-items:center;gap:6px;transition:opacity .15s;white-space:nowrap}
+.btn-add:hover{opacity:.88}
+.btn-add.loading{opacity:.6;pointer-events:none}
+.cats{display:flex;gap:4px;flex-wrap:wrap}
+.cat-btn{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;color:var(--text2);font-family:var(--sans);transition:all .15s;white-space:nowrap}
+.cat-btn.active,.cat-btn:hover{background:var(--text);color:var(--bg);border-color:var(--text)}
+.scroll{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;min-width:820px;border-collapse:collapse}
+thead th{font-size:10px;font-weight:500;color:var(--text2);text-align:right;padding:9px 8px;white-space:nowrap;background:var(--bg2);border-bottom:1px solid var(--border2);position:sticky;top:0;z-index:2}
+thead th:first-child{text-align:left;border-radius:9px 0 0 0}
+thead th:last-child{border-radius:0 9px 0 0}
+thead th.th-l{text-align:left}
+tbody tr{transition:background .1s}
+tbody tr:hover td{background:var(--bg2)}
+tbody tr:last-child td{border-bottom:none}
+td{padding:9px 8px;border-bottom:1px solid var(--border);text-align:right;vertical-align:middle;color:var(--text);white-space:nowrap}
+td.td-l{text-align:left;white-space:normal;min-width:170px}
+td.td-c{text-align:center}
+td.td-notes{text-align:left;white-space:normal;min-width:110px;font-size:11px;color:var(--text2)}
+.car-name{font-weight:500;font-size:13px;line-height:1.3}
+.car-sub{font-size:10px;color:var(--text2);margin-top:1px}
+.tag{display:inline-block;font-size:9px;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle;font-weight:500}
+.tag-top{background:#FAECE7;color:#993C1D}
+.tag-hybrid{background:#EAF3DE;color:#3B6D11}
+.tag-truck{background:#E6F1FB;color:#185FA5}
+.tag-euro{background:#EEEDFE;color:#3C3489}
+.tag-perf{background:#FAF0DA;color:#854F0B}
+.tag-diesel{background:#F1EFE8;color:#5F5E5A}
+.val-g{font-size:11px;color:var(--text2);font-family:var(--mono)}
+.val-d{font-size:12px;font-weight:500;font-family:var(--mono)}
+.val-total{font-weight:600;font-family:var(--mono);font-size:13px}
+.val-all{font-weight:600;font-family:var(--mono);font-size:13px;color:var(--blue)}
+.val-pay{font-weight:600;font-family:var(--mono);font-size:12px;color:var(--green)}
+.sec-row td{background:var(--bg3)!important;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);padding:6px 8px;text-align:left!important}
+.btn-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;padding:2px 6px;border-radius:4px;transition:all .15s}
+.btn-del:hover{color:#E24B4A;background:#FCEBEB}
+.empty{text-align:center;padding:40px;color:var(--text2);font-size:13px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg);border:1px solid var(--border2);border-radius:14px;padding:24px;width:min(420px,90vw);box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:6px}
+.modal p{font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.5}
+.modal input{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;font-family:var(--sans);font-size:14px;color:var(--text);outline:none;margin-bottom:12px}
+.modal input:focus{border-color:var(--blue)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+.btn-cancel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:var(--sans);font-size:13px;color:var(--text)}
+.btn-go{background:var(--accent);border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-family:var(--sans);font-size:13px;color:#fff;font-weight:500}
+.btn-go:disabled{opacity:.5;pointer-events:none}
+.status{font-size:11px;color:var(--text2);font-family:var(--mono);margin-bottom:8px;min-height:16px}
+.status.err{color:#E24B4A}
+.status.ok{color:var(--green)}
+.count{font-size:11px;color:var(--text3);font-family:var(--mono);padding:6px 0 4px}
+</style>
+
+<div class="app">
+  <div class="header">
+    <div class="title"><span>PGM</span> Cat Tracker — Canada</div>
+    <div class="updated" id="updated">Loading prices…</div>
+  </div>
+
+  <div class="prices">
+    <div class="price-card">
+      <div class="price-metal">Platinum (Pt)</div>
+      <div class="price-oz" id="pt-oz">—/troy oz</div>
+      <div class="price-g" id="pt-g">—<span>/gram</span></div>
+    </div>
+    <div class="price-card">
+      <div class="price-metal">Palladium (Pd)</div>
+      <div class="price-oz" id="pd-oz">—/troy oz</div>
+      <div class="price-g" id="pd-g">—<span>/gram</span></div>
+    </div>
+    <div class="price-card">
+      <div class="price-metal">Rhodium (Rh) ⭐</div>
+      <div class="price-oz" id="rh-oz">—/troy oz</div>
+      <div class="price-g" id="rh-g">—<span>/gram</span></div>
+    </div>
+    <button class="btn-refresh" id="btn-refresh" onclick="refreshPrices()">
+      <span id="refresh-icon">↻</span> Refresh Prices
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search" placeholder="Search cars…" oninput="onSearch(this.value)">
+    </div>
+    <button class="btn-add" id="btn-add" onclick="openModal()">+ Add Car</button>
+  </div>
+
+  <div class="cats" id="cat-tabs"></div>
+  <div class="count" id="count"></div>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th class="th-l">Vehicle</th>
+          <th>Cats</th>
+          <th>Pt g</th><th>Pt $</th>
+          <th>Pd g</th><th>Pd $</th>
+          <th>Rh g</th><th>Rh $</th>
+          <th>Total/cat</th>
+          <th>Total all</th>
+          <th class="th-l">You get paid</th>
+          <th class="th-l">Notes</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3>Add a car</h3>
+    <p>Type any car make, model and year. AI will look up its catalytic converter metal content and add it to your list.</p>
+    <input type="text" id="car-input" placeholder="e.g. 2019 Subaru Impreza" onkeydown="if(event.key==='Enter')addCar()">
+    <div class="status" id="modal-status"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-go" id="btn-go" onclick="addCar()">Add with AI</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TROY = 31.1035;
+const CATS_KEY = 'pgm-cars-v2';
+const PRICES_KEY = 'pgm-prices-v2';
+const CATS = [
+  {id:'all',label:'All'},
+  {id:'top',label:'🔥 Top tier'},
+  {id:'strong',label:'🟡 Strong'},
+  {id:'average',label:'🔵 Average'},
+  {id:'low',label:'⚪ Low'},
+  {id:'diesel',label:'⛽ Diesel'},
+];
+const TAG_MAP = {top:'tag-top',hybrid:'tag-hybrid',truck:'tag-truck',euro:'tag-euro',perf:'tag-perf',diesel:'tag-diesel'};
+const TAG_LABEL = {top:'Supercar',hybrid:'Hybrid',truck:'Heavy Truck',euro:'Euro',perf:'Performance',diesel:'Diesel'};
+const CAT_MAP = {top:'top',strong:'strong',average:'average',small:'low',low:'low',diesel:'diesel',ev:'low'};
+
+const DEFAULT_CARS = [
+  {id:1,name:'Ferrari F430',sub:'V8 · 2 cats',cats:2,ptG:8,pdG:6,rhG:3,tags:['top'],tier:'top',notes:'Highest scrap cat ever'},
+  {id:2,name:'Lamborghini Aventador',sub:'V12 6.5L · 2 cats',cats:2,ptG:7,pdG:6,rhG:2.5,tags:['top'],tier:'top',notes:'Rare but worth a lot'},
+  {id:3,name:'Toyota Land Cruiser',sub:'V8 · large SUV',cats:2,ptG:6,pdG:5,rhG:2,tags:[],tier:'top',notes:'Very popular in Canada'},
+  {id:4,name:'Ram 2500 / 3500',sub:'Heavy duty V8',cats:1,ptG:6,pdG:5,rhG:2,tags:['truck'],tier:'top',notes:'High theft target'},
+  {id:5,name:'Ford F-250 / F-350 Super Duty',sub:'Torpedo-style cat',cats:2,ptG:6,pdG:4,rhG:2,tags:['truck'],tier:'top',notes:'Torpedo cats = $820 each'},
+  {id:6,name:'Toyota Prius',sub:'All years · hybrid',cats:1,ptG:5,pdG:6,rhG:2,tags:['hybrid'],tier:'top',notes:'Most stolen in Canada'},
+  {id:7,name:'Toyota Tundra',sub:'V8 pickup · sits high',cats:3,ptG:5,pdG:4,rhG:1.5,tags:[],tier:'top',notes:'4-cat models very valuable'},
+  {id:8,name:'Porsche Cayenne / Panamera',sub:'V6/V8 · Euro6',cats:2,ptG:4,pdG:4,rhG:2,tags:['euro'],tier:'strong',notes:'Euro6 = premium loading'},
+  {id:9,name:'BMW X5 / X7',sub:'3.0L or V8 luxury SUV',cats:2,ptG:4,pdG:4,rhG:1.5,tags:['euro'],tier:'strong',notes:''},
+  {id:10,name:'Mercedes-Benz GLE / E-Class',sub:'V6 or inline-6',cats:2,ptG:4,pdG:3.5,rhG:1.5,tags:['euro'],tier:'strong',notes:''},
+  {id:11,name:'Toyota RAV4 Hybrid',sub:'2019+ · hybrid system',cats:1,ptG:4,pdG:5,rhG:2,tags:['hybrid'],tier:'strong',notes:'Hybrid = much more than gas RAV4'},
+  {id:12,name:'Ford F-150 V8 5.0L',sub:'#1 selling in Canada',cats:2,ptG:5,pdG:4,rhG:1.5,tags:['truck'],tier:'strong',notes:'V6 EcoBoost = less'},
+  {id:13,name:'Chevrolet Silverado 1500 V8 5.3L',sub:'Two cats on V8',cats:2,ptG:4,pdG:3.5,rhG:1.5,tags:[],tier:'strong',notes:'High theft — 2 cats visible'},
+  {id:14,name:'GMC Sierra 1500 / 2500',sub:'Same platform as Silverado',cats:2,ptG:4,pdG:3.5,rhG:1.5,tags:[],tier:'strong',notes:''},
+  {id:15,name:'Chevrolet Tahoe / GMC Yukon',sub:'Full-size V8 SUV',cats:2,ptG:4,pdG:3.5,rhG:1.5,tags:[],tier:'strong',notes:''},
+  {id:16,name:'Toyota 4Runner',sub:'V6 · truck platform',cats:2,ptG:4,pdG:3,rhG:1.5,tags:[],tier:'strong',notes:''},
+  {id:17,name:'Jeep Grand Cherokee V8 5.7L',sub:'Hemi engine',cats:2,ptG:4,pdG:3,rhG:1.5,tags:[],tier:'strong',notes:'V6 = much less'},
+  {id:18,name:'Ford Mustang GT V8',sub:'5.0L Coyote',cats:2,ptG:4,pdG:3,rhG:1.5,tags:['perf'],tier:'strong',notes:'V6 Mustang = $100–180'},
+  {id:19,name:'Dodge Charger / Challenger V8',sub:'5.7L or 6.4L Hemi',cats:2,ptG:4,pdG:3,rhG:1.5,tags:['perf'],tier:'strong',notes:''},
+  {id:20,name:'Ford Expedition',sub:'V8 full-size SUV',cats:2,ptG:4,pdG:3,rhG:1.5,tags:[],tier:'strong',notes:''},
+  {id:21,name:'Ford Escape Hybrid',sub:'2.5L hybrid',cats:1,ptG:3,pdG:4,rhG:1.5,tags:['hybrid'],tier:'strong',notes:''},
+  {id:22,name:'Honda CR-V',sub:'2.0L / 1.5T · most popular SUV',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
+  {id:23,name:'Toyota RAV4 (gas)',sub:'2.5L · #1 SUV in Canada',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:'Hybrid version = 2× more'},
+  {id:24,name:'Toyota Camry V6',sub:'3.5L',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:'4-cyl = lower'},
+  {id:25,name:'Honda Accord V6',sub:'3.5L',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
+  {id:26,name:'Dodge Grand Caravan / Chrysler',sub:'3.6L V6 · very common',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
+  {id:27,name:'Honda Odyssey',sub:'V6 minivan',cats:1,ptG:3,pdG:3.5,rhG:1,tags:[],tier:'average',notes:''},
+  {id:28,name:'Ford Explorer V6 3.5L',sub:'Mid-size SUV',cats:2,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:'Varies a lot by year'},
+  {id:29,name:'Jeep Wrangler V6',sub:'3.6L Pentastar',cats:1,ptG:3,pdG:2.5,rhG:1,tags:[],tier:'average',notes:''},
+  {id:30,name:'Mazda CX-5 / Mazda 3',sub:'Skyactiv 2.0 / 2.5L',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
+  {id:31,name:'Hyundai Santa Fe / Tucson',sub:'2.0L / 2.5L GDI',cats:1,ptG:2.5,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
+  {id:32,name:'Kia Sorento / Sportage',sub:'Same platform as Hyundai',cats:1,ptG:2.5,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
+  {id:33,name:'Nissan Rogue / Murano',sub:'2.5L / 3.5L',cats:1,ptG:2.5,pdG:2.5,rhG:1,tags:[],tier:'average',notes:''},
+  {id:34,name:'Subaru Outback / Forester',sub:'Boxer 2.5L',cats:1,ptG:2.5,pdG:2.5,rhG:1,tags:[],tier:'average',notes:'Boxer = slightly less efficient'},
+  {id:35,name:'Chevrolet Equinox / GMC Terrain',sub:'1.5T / 2.0T compact SUV',cats:1,ptG:2.5,pdG:2.5,rhG:0.8,tags:[],tier:'average',notes:''},
+  {id:36,name:'Nissan Altima / Sentra',sub:'2.0L / 2.5L sedan',cats:1,ptG:2.5,pdG:2.5,rhG:0.8,tags:[],tier:'average',notes:''},
+  {id:37,name:'Ford F-150 EcoBoost V6',sub:'2.7L / 3.5L EcoBoost',cats:2,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:'Less than V8 version'},
+  {id:38,name:'Honda Civic / Honda Fit',sub:'1.5T / 1.5L small',cats:1,ptG:2,pdG:2,rhG:0.5,tags:[],tier:'low',notes:'Most common car in Canada'},
+  {id:39,name:'Toyota Corolla',sub:'2.0L',cats:1,ptG:2,pdG:2,rhG:0.5,tags:[],tier:'low',notes:''},
+  {id:40,name:'Hyundai Elantra / Kia Forte',sub:'2.0L entry sedan',cats:1,ptG:2,pdG:2,rhG:0.4,tags:[],tier:'low',notes:''},
+  {id:41,name:'VW Jetta / Golf TDI',sub:'Diesel · no Rh',cats:1,ptG:3,pdG:1,rhG:0,tags:['diesel'],tier:'diesel',notes:'Zero rhodium in diesel'},
+  {id:42,name:'BMW 3 Series diesel',sub:'320d / 330d',cats:1,ptG:3.5,pdG:1,rhG:0,tags:['diesel'],tier:'diesel',notes:'Despite BMW name — no Rh'},
+  {id:43,name:'Any EV (Tesla / Bolt / Leaf)',sub:'No combustion engine',cats:0,ptG:0,pdG:0,rhG:0,tags:[],tier:'low',notes:'Nothing to sell'},
+  {id:44,name:'Aftermarket / universal cat',sub:'Any car · replacement part',cats:1,ptG:0.3,pdG:0.2,rhG:0.05,tags:[],tier:'low',notes:'~10% of OEM content'},
+];
+
+let cars = [];
+let prices = {ptOz:2002, pdOz:1514, rhOz:9650};
+let searchQ = '';
+let activeTab = 'all';
+let nextId = 100;
+
+function pgram(oz){ return oz/TROY; }
+function fmt(n){ return '$'+Math.round(n).toLocaleString(); }
+function fmtG(g){ return parseFloat(g).toFixed(1)+'g'; }
+
+function calcRow(c){
+  const pt=pgram(prices.ptOz), pd=pgram(prices.pdOz), rh=pgram(prices.rhOz);
+  const ptD=c.ptG*pt, pdD=c.pdG*pd, rhD=c.rhG*rh;
+  const perCat=ptD+pdD+rhD;
+  const allCats=perCat*c.cats;
+  const payLo=Math.round(allCats*0.50), payHi=Math.round(allCats*0.65);
+  return {pt,pd,rh,ptD,pdD,rhD,perCat,allCats,payLo,payHi};
+}
+
+function tierToSection(t){
+  if(t==='top') return '🔥 Top tier — supercars & heavy trucks';
+  if(t==='strong') return '🟡 Strong — $250–500 per cat';
+  if(t==='average') return '🔵 Average — $100–250 per cat';
+  if(t==='low') return '⚪ Low tier';
+  if(t==='diesel') return '⛽ Diesel — no rhodium';
+  return '';
+}
+
+function render(){
+  const pt=pgram(prices.ptOz), pd=pgram(prices.pdOz), rh=pgram(prices.rhOz);
+  document.getElementById('pt-oz').textContent='$'+Math.round(prices.ptOz)+'/troy oz';
+  document.getElementById('pd-oz').textContent='$'+Math.round(prices.pdOz)+'/troy oz';
+  document.getElementById('rh-oz').textContent='$'+Math.round(prices.rhOz)+'/troy oz';
+  document.getElementById('pt-g').innerHTML='$'+pt.toFixed(2)+'<span>/gram</span>';
+  document.getElementById('pd-g').innerHTML='$'+pd.toFixed(2)+'<span>/gram</span>';
+  document.getElementById('rh-g').innerHTML='$'+rh.toFixed(2)+'<span>/gram</span>';
+
+  // Tabs
+  const tabsEl=document.getElementById('cat-tabs');
+  tabsEl.innerHTML=CATS.map(c=>`<button class="cat-btn${activeTab===c.id?' active':''}" onclick="setTab('${c.id}')">${c.label}</button>`).join('');
+
+  // Filter
+  let filtered=cars.filter(c=>{
+    const q=searchQ.toLowerCase();
+    const match=!q||c.name.toLowerCase().includes(q)||(c.sub||'').toLowerCase().includes(q)||(c.notes||'').toLowerCase().includes(q);
+    const tabMatch=activeTab==='all'||c.tier===activeTab;
+    return match&&tabMatch;
+  });
+
+  document.getElementById('count').textContent=filtered.length+' vehicle'+(filtered.length!==1?'s':'');
+
+  // Group by tier
+  const tiers=['top','strong','average','low','diesel'];
+  const tbody=document.getElementById('tbody');
+  if(!filtered.length){
+    tbody.innerHTML=`<tr><td colspan="13" class="empty">No vehicles found. Try a different search or add one with AI.</td></tr>`;
+    return;
+  }
+  let html='';
+  let lastTier='';
+  tiers.forEach(tier=>{
+    const rows=filtered.filter(c=>c.tier===tier);
+    if(!rows.length) return;
+    if(tier!==lastTier){
+      html+=`<tr class="sec-row"><td colspan="13">${tierToSection(tier)}</td></tr>`;
+      lastTier=tier;
+    }
+    rows.forEach(c=>{
+      const r=calcRow(c);
+      const tags=(c.tags||[]).map(t=>`<span class="tag ${TAG_MAP[t]||''}">${TAG_LABEL[t]||t}</span>`).join('');
+      const catsLabel=c.cats===0?'—':c.cats===1?'×1':'×'+c.cats;
+      const payStr=c.cats===0?'$0':fmt(r.payLo)+'–'+fmt(r.payHi);
+      const totalAllStr=c.cats===0?'$0':fmt(r.allCats);
+      const perCatStr=c.cats===0?'$0':fmt(r.perCat);
+      html+=`<tr>
+        <td class="td-l"><div class="car-name">${c.name}${tags}</div><div class="car-sub">${c.sub||''}</div></td>
+        <td class="td-c">${catsLabel}</td>
+        <td><span class="val-g">${fmtG(c.ptG)}</span></td><td><span class="val-d">${fmt(r.ptD)}</span></td>
+        <td><span class="val-g">${fmtG(c.pdG)}</span></td><td><span class="val-d">${fmt(r.pdD)}</span></td>
+        <td><span class="val-g">${fmtG(c.rhG)}</span></td><td><span class="val-d">${fmt(r.rhD)}</span></td>
+        <td><span class="val-total">${perCatStr}</span></td>
+        <td><span class="val-all">${totalAllStr}</span></td>
+        <td class="td-l"><span class="val-pay">${payStr}</span></td>
+        <td class="td-notes">${c.notes||''}</td>
+        <td><button class="btn-del" onclick="deleteCar(${c.id})">✕</button></td>
+      </tr>`;
+    });
+  });
+  tbody.innerHTML=html;
+}
+
+function setTab(t){ activeTab=t; render(); }
+function onSearch(v){ searchQ=v; render(); }
+
+async function loadData(){
+  try{
+    const cr=await window.storage.get(CARS_KEY);
+    if(cr&&cr.value) cars=JSON.parse(cr.value);
+    else cars=[...DEFAULT_CARS];
+  }catch(e){ cars=[...DEFAULT_CARS]; }
+  try{
+    const pr=await window.storage.get(PRICES_KEY);
+    if(pr&&pr.value){ const p=JSON.parse(pr.value); prices={...prices,...p}; }
+  }catch(e){}
+  nextId=Math.max(...cars.map(c=>c.id),99)+1;
+  const d=new Date();
+  document.getElementById('updated').textContent='Last updated: '+d.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
+  render();
+}
+
+async function saveData(){
+  try{ await window.storage.set(CARS_KEY,JSON.stringify(cars)); }catch(e){}
+}
+
+async function savePrices(){
+  try{ await window.storage.set(PRICES_KEY,JSON.stringify(prices)); }catch(e){}
+}
+
+async function refreshPrices(){
+  const btn=document.getElementById('btn-refresh');
+  const icon=document.getElementById('refresh-icon');
+  btn.classList.add('loading');
+  icon.textContent='…';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:500,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        messages:[{role:'user',content:'Search for current spot prices today for platinum, palladium, and rhodium in USD per troy ounce from kitco.com or similar. Respond with ONLY a raw JSON object and nothing else, no markdown, no explanation: {"ptOz":2002,"pdOz":1514,"rhOz":9650} — replace the numbers with today\'s actual prices.'}]
+      })
+    });
+    const data=await res.json();
+    const texts=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const match=texts.match(/\{[^}]*"ptOz"[^}]*\}/);
+    if(match){
+      const p=JSON.parse(match[0]);
+      if(p.ptOz&&p.pdOz&&p.rhOz){ prices={...prices,...p}; await savePrices(); }
+    }
+    const d=new Date();
+    document.getElementById('updated').textContent='Updated: '+d.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'})+' '+d.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
+  }catch(e){ console.error(e); }
+  btn.classList.remove('loading');
+  icon.textContent='↻';
+  render();
+}
+
+function openModal(){
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('car-input').value='';
+  document.getElementById('modal-status').textContent='';
+  document.getElementById('modal-status').className='status';
+  document.getElementById('btn-go').disabled=false;
+  setTimeout(()=>document.getElementById('car-input').focus(),100);
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+
+async function addCar(){
+  const name=document.getElementById('car-input').value.trim();
+  if(!name) return;
+  const st=document.getElementById('modal-status');
+  const btn=document.getElementById('btn-go');
+  btn.disabled=true;
+  st.textContent='Looking up metal content…';
+  st.className='status';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:600,
+        messages:[{role:'user',content:`Provide catalytic converter PGM data for: "${name}". Return ONLY a raw JSON object, no markdown, no explanation:\n{"name":"full car name","sub":"engine info","cats":1,"ptG":3.0,"pdG":3.0,"rhG":1.0,"tags":["hybrid"],"tier":"average","notes":"short note"}\ntier must be one of: top, strong, average, low, diesel\ntags array can include zero or more of: hybrid, truck, euro, perf, top, diesel\nptG/pdG/rhG are average grams of Pt/Pd/Rh in one catalytic converter unit.\nDiesel vehicles have rhG=0. EVs have all zeros and cats=0.`}]
+      })
+    });
+    const data=await res.json();
+    const text=data.content.find(b=>b.type==='text')?.text||'';
+    const match=text.match(/\{[\s\S]*?\}/);
+    if(!match) throw new Error('No data returned');
+    const car=JSON.parse(match[0]);
+    car.id=nextId++;
+    if(!car.tier) car.tier='average';
+    cars.push(car);
+    await saveData();
+    st.textContent='✓ Added: '+car.name;
+    st.className='status ok';
+    render();
+    setTimeout(closeModal,1200);
+  }catch(e){
+    st.textContent='Could not find data for that vehicle. Try being more specific (year, make, model).';
+    st.className='status err';
+    btn.disabled=false;
+  }
+}
+
+async function deleteCar(id){
+  cars=cars.filter(c=>c.id!==id);
+  await saveData();
+  render();
+}
+
+document.getElementById('modal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+
+loadData();
+</script>
