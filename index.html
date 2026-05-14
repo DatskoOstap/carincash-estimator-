@@ -1,14 +1,33 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PGM Cat Tracker — Canada</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:var(--color-background-primary);--bg2:var(--color-background-secondary);--bg3:var(--color-background-tertiary);--border:var(--color-border-tertiary);--border2:var(--color-border-secondary);--text:var(--color-text-primary);--text2:var(--color-text-secondary);--text3:var(--color-text-tertiary);--accent:#D85A30;--accent2:#BA7517;--blue:#185FA5;--green:#3B6D11;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;min-height:100vh}
+:root{--bg:#ffffff;--bg2:#f5f5f5;--bg3:#efefef;--border:#e0e0e0;--border2:#ccc;--text:#111;--text2:#555;--text3:#999;--accent:#D85A30;--blue:#185FA5;--green:#3B6D11;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#111;--bg2:#1a1a1a;--bg3:#222;--border:#2a2a2a;--border2:#333;--text:#f0f0f0;--text2:#aaa;--text3:#666}}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13px;min-height:100vh;display:none}
+
+/* ── LAYOUT ── */
 .app{padding:14px 14px 40px}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
-.title{font-size:16px;font-weight:600;letter-spacing:-.02em;color:var(--text)}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.title{font-size:16px;font-weight:600;letter-spacing:-.02em}
 .title span{color:var(--accent);font-family:var(--mono)}
+.header-right{display:flex;align-items:center;gap:10px}
 .updated{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.btn-logout{background:none;border:1px solid var(--border2);border-radius:6px;padding:5px 10px;cursor:pointer;font-family:var(--sans);font-size:11px;color:var(--text2);transition:all .15s}
+.btn-logout:hover{border-color:#E24B4A;color:#E24B4A}
+
+/* ── TABS ── */
+.tab-nav{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.tab-btn{background:none;border:none;border-bottom:2px solid transparent;padding:8px 16px;cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--text2);margin-bottom:-1px;transition:all .15s}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:hover:not(.active){color:var(--text)}
+
+/* ── PRICES ── */
 .prices{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:8px;margin-bottom:12px;align-items:stretch}
 .price-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
 .price-metal{font-size:10px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
@@ -18,6 +37,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13
 .btn-refresh{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:0 14px;cursor:pointer;font-family:var(--sans);font-size:12px;color:var(--text);white-space:nowrap;display:flex;align-items:center;gap:6px;transition:all .15s}
 .btn-refresh:hover{border-color:var(--accent);color:var(--accent)}
 .btn-refresh.loading{opacity:.6;pointer-events:none}
+
+/* ── TRACKER ── */
 .toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
 .search-wrap{position:relative;flex:1;min-width:180px}
 .search-wrap input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px 8px 32px;font-family:var(--sans);font-size:13px;color:var(--text);outline:none;transition:border .15s}
@@ -26,17 +47,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:13
 .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px}
 .btn-add{background:var(--accent);border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-family:var(--sans);font-size:13px;color:#fff;font-weight:500;display:flex;align-items:center;gap:6px;transition:opacity .15s;white-space:nowrap}
 .btn-add:hover{opacity:.88}
-.btn-add.loading{opacity:.6;pointer-events:none}
 .cats{display:flex;gap:4px;flex-wrap:wrap}
 .cat-btn{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;color:var(--text2);font-family:var(--sans);transition:all .15s;white-space:nowrap}
 .cat-btn.active,.cat-btn:hover{background:var(--text);color:var(--bg);border-color:var(--text)}
-.scroll{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+.scroll{overflow-x:auto;border:1px solid var(--border);border-radius:10px;margin-top:10px}
 table{width:100%;min-width:820px;border-collapse:collapse}
 thead th{font-size:10px;font-weight:500;color:var(--text2);text-align:right;padding:9px 8px;white-space:nowrap;background:var(--bg2);border-bottom:1px solid var(--border2);position:sticky;top:0;z-index:2}
 thead th:first-child{text-align:left;border-radius:9px 0 0 0}
 thead th:last-child{border-radius:0 9px 0 0}
 thead th.th-l{text-align:left}
-tbody tr{transition:background .1s}
 tbody tr:hover td{background:var(--bg2)}
 tbody tr:last-child td{border-bottom:none}
 td{padding:9px 8px;border-bottom:1px solid var(--border);text-align:right;vertical-align:middle;color:var(--text);white-space:nowrap}
@@ -61,6 +80,9 @@ td.td-notes{text-align:left;white-space:normal;min-width:110px;font-size:11px;co
 .btn-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;padding:2px 6px;border-radius:4px;transition:all .15s}
 .btn-del:hover{color:#E24B4A;background:#FCEBEB}
 .empty{text-align:center;padding:40px;color:var(--text2);font-size:13px}
+.count{font-size:11px;color:var(--text3);font-family:var(--mono);padding:6px 0 4px}
+
+/* ── MODAL ── */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
 .modal-bg.open{display:flex}
 .modal{background:var(--bg);border:1px solid var(--border2);border-radius:14px;padding:24px;width:min(420px,90vw);box-shadow:0 20px 60px rgba(0,0,0,.2)}
@@ -75,68 +97,251 @@ td.td-notes{text-align:left;white-space:normal;min-width:110px;font-size:11px;co
 .status{font-size:11px;color:var(--text2);font-family:var(--mono);margin-bottom:8px;min-height:16px}
 .status.err{color:#E24B4A}
 .status.ok{color:var(--green)}
-.count{font-size:11px;color:var(--text3);font-family:var(--mono);padding:6px 0 4px}
+
+/* ── ESTIMATOR ── */
+.est-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:820px){.est-layout{grid-template-columns:1fr}}
+
+.est-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.est-card h4{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:12px}
+
+.est-label{display:block;font-size:11px;color:var(--text2);margin-bottom:5px;margin-top:10px}
+.est-label:first-of-type{margin-top:0}
+.est-input{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:7px;padding:9px 11px;font-family:var(--sans);font-size:13px;color:var(--text);outline:none;transition:border .15s}
+.est-input:focus{border-color:var(--blue)}
+.est-input::placeholder{color:var(--text3)}
+
+/* car search */
+.est-search-wrap{position:relative}
+.est-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--bg);border:1px solid var(--border2);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:20;margin-top:3px;display:none}
+.est-dropdown.open{display:block}
+.est-drop-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:13px;transition:background .1s}
+.est-drop-item:last-child{border-bottom:none}
+.est-drop-item:hover{background:var(--bg2)}
+.est-drop-name{font-weight:500}
+.est-drop-sub{font-size:10px;color:var(--text2)}
+.est-drop-val{font-size:11px;font-family:var(--mono);color:var(--green);float:right;margin-top:2px}
+
+/* cat badge */
+.est-cat-badge{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 11px;margin-top:8px;font-size:12px}
+.est-cat-badge.found{border-color:#3B6D11;background:#f0fae6}
+@media(prefers-color-scheme:dark){.est-cat-badge.found{background:#1a2e10;border-color:#3B6D11}}
+.est-cat-name{color:var(--text2)}
+.est-cat-val{font-family:var(--mono);font-weight:600;color:var(--green)}
+
+/* checkboxes */
+.est-checks{display:flex;flex-direction:column;gap:10px}
+.est-check{display:flex;align-items:center;gap:10px;cursor:pointer}
+.est-check input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.est-check-label{font-size:13px;color:var(--text)}
+.est-check-pill{font-size:10px;font-weight:600;font-family:var(--mono);padding:1px 6px;border-radius:4px;margin-left:4px}
+.pill-add{background:#e8f5e9;color:#2e7d32}
+.pill-sub{background:#fce8e8;color:#c62828}
+@media(prefers-color-scheme:dark){.pill-add{background:#1a3320;color:#66bb6a}.pill-sub{background:#2d1515;color:#ef5350}}
+
+/* result breakdown */
+.est-result{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:0}
+.est-result h4{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text2);margin-bottom:12px}
+.est-line{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;color:var(--text2)}
+.est-line.weight{color:var(--text);font-weight:500}
+.est-line.deduct{color:#c62828}
+.est-line.add{color:#2e7d32}
+@media(prefers-color-scheme:dark){.est-line.deduct{color:#ef5350}.est-line.add{color:#66bb6a}}
+.est-divider{border:none;border-top:1px solid var(--border);margin:10px 0}
+.est-total{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.est-total-label{font-size:14px;font-weight:600}
+.est-total-val{font-size:22px;font-weight:600;font-family:var(--mono);color:var(--accent)}
+.est-empty{font-size:12px;color:var(--text3);text-align:center;padding:20px 0}
+
+/* sales script */
+.script-intro{font-size:13px;line-height:1.7;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:0;font-style:italic}
+.script-intro strong{font-style:normal;color:var(--accent)}
+
+/* question step-through */
+.q-step{background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:16px;margin-top:12px}
+.q-num{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-family:var(--mono);margin-bottom:6px}
+.q-text{font-size:14px;font-weight:500;color:var(--text);margin-bottom:12px;line-height:1.5}
+.q-answer{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:9px 11px;font-family:var(--sans);font-size:13px;color:var(--text);outline:none;resize:vertical;min-height:60px;transition:border .15s}
+.q-answer:focus{border-color:var(--blue)}
+.q-answer::placeholder{color:var(--text3)}
+.q-nav{display:flex;gap:8px;justify-content:space-between;margin-top:10px}
+.q-nav button{background:var(--bg2);border:1px solid var(--border2);border-radius:7px;padding:7px 14px;cursor:pointer;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--text);transition:all .15s}
+.q-nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.q-nav button:disabled{opacity:.35;cursor:not-allowed}
+.q-nav .btn-next{background:var(--accent);border-color:var(--accent);color:#fff}
+.q-nav .btn-next:hover{opacity:.88}
+.q-summary{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.q-summary-item{background:var(--bg2);border-radius:7px;padding:9px 12px;font-size:12px}
+.q-summary-q{color:var(--text2);margin-bottom:2px}
+.q-summary-a{color:var(--text);font-weight:500}
+
+/* notes */
+.notes-area{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:7px;padding:11px;font-family:var(--sans);font-size:13px;color:var(--text);outline:none;resize:vertical;min-height:110px;line-height:1.6;transition:border .15s}
+.notes-area:focus{border-color:var(--blue)}
+.notes-area::placeholder{color:var(--text3)}
+.notes-saved{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:5px;min-height:14px}
 </style>
+</head>
+<body>
 
 <div class="app">
+  <!-- HEADER -->
   <div class="header">
     <div class="title"><span>PGM</span> Cat Tracker — Canada</div>
-    <div class="updated" id="updated">Loading prices…</div>
+    <div class="header-right">
+      <div class="updated" id="updated">Loading prices…</div>
+      <button class="btn-logout" onclick="logout()">Sign out</button>
+    </div>
   </div>
 
-  <div class="prices">
-    <div class="price-card">
-      <div class="price-metal">Platinum (Pt)</div>
-      <div class="price-oz" id="pt-oz">—/troy oz</div>
-      <div class="price-g" id="pt-g">—<span>/gram</span></div>
-    </div>
-    <div class="price-card">
-      <div class="price-metal">Palladium (Pd)</div>
-      <div class="price-oz" id="pd-oz">—/troy oz</div>
-      <div class="price-g" id="pd-g">—<span>/gram</span></div>
-    </div>
-    <div class="price-card">
-      <div class="price-metal">Rhodium (Rh) ⭐</div>
-      <div class="price-oz" id="rh-oz">—/troy oz</div>
-      <div class="price-g" id="rh-g">—<span>/gram</span></div>
-    </div>
-    <button class="btn-refresh" id="btn-refresh" onclick="refreshPrices()">
-      <span id="refresh-icon">↻</span> Refresh Prices
-    </button>
+  <!-- TABS -->
+  <div class="tab-nav">
+    <button class="tab-btn active" id="tab-btn-tracker" onclick="switchTab('tracker')">Cat Tracker</button>
+    <button class="tab-btn" id="tab-btn-estimator" onclick="switchTab('estimator')">Estimator</button>
   </div>
 
-  <div class="toolbar">
-    <div class="search-wrap">
-      <span class="search-icon">⌕</span>
-      <input type="text" id="search" placeholder="Search cars…" oninput="onSearch(this.value)">
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PAGE: TRACKER                               -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="page-tracker">
+    <div class="prices">
+      <div class="price-card">
+        <div class="price-metal">Platinum (Pt)</div>
+        <div class="price-oz" id="pt-oz">—/troy oz</div>
+        <div class="price-g" id="pt-g">—<span>/gram</span></div>
+      </div>
+      <div class="price-card">
+        <div class="price-metal">Palladium (Pd)</div>
+        <div class="price-oz" id="pd-oz">—/troy oz</div>
+        <div class="price-g" id="pd-g">—<span>/gram</span></div>
+      </div>
+      <div class="price-card">
+        <div class="price-metal">Rhodium (Rh) ⭐</div>
+        <div class="price-oz" id="rh-oz">—/troy oz</div>
+        <div class="price-g" id="rh-g">—<span>/gram</span></div>
+      </div>
+      <button class="btn-refresh" id="btn-refresh" onclick="refreshPrices()">
+        <span id="refresh-icon">↻</span> Refresh Prices
+      </button>
     </div>
-    <button class="btn-add" id="btn-add" onclick="openModal()">+ Add Car</button>
+
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="search" placeholder="Search cars…" oninput="onSearch(this.value)">
+      </div>
+      <button class="btn-add" onclick="openModal()">+ Add Car</button>
+    </div>
+
+    <div class="cats" id="cat-tabs"></div>
+    <div class="count" id="count"></div>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th class="th-l">Vehicle</th>
+            <th>Cats</th>
+            <th>Pt g</th><th>Pt $</th>
+            <th>Pd g</th><th>Pd $</th>
+            <th>Rh g</th><th>Rh $</th>
+            <th>Total/cat</th>
+            <th>Total all</th>
+            <th class="th-l">You get paid</th>
+            <th class="th-l">Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
   </div>
 
-  <div class="cats" id="cat-tabs"></div>
-  <div class="count" id="count"></div>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PAGE: ESTIMATOR                             -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="page-estimator" style="display:none">
+    <div class="est-layout">
 
-  <div class="scroll">
-    <table>
-      <thead>
-        <tr>
-          <th class="th-l">Vehicle</th>
-          <th>Cats</th>
-          <th>Pt g</th><th>Pt $</th>
-          <th>Pd g</th><th>Pd $</th>
-          <th>Rh g</th><th>Rh $</th>
-          <th>Total/cat</th>
-          <th>Total all</th>
-          <th class="th-l">You get paid</th>
-          <th class="th-l">Notes</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+      <!-- LEFT: CALCULATOR -->
+      <div>
+        <!-- Car search -->
+        <div class="est-card">
+          <h4>Vehicle</h4>
+          <label class="est-label">Car make, model & year</label>
+          <div class="est-search-wrap">
+            <input class="est-input" id="est-car" placeholder="e.g. 2018 Toyota Camry" autocomplete="off" oninput="estCarSearch(this.value)">
+            <div class="est-dropdown" id="est-dropdown"></div>
+          </div>
+          <div class="est-cat-badge" id="est-cat-badge">
+            <span class="est-cat-name" id="est-cat-name">No car selected — using $180 average</span>
+            <span class="est-cat-val" id="est-cat-val">$180</span>
+          </div>
+
+          <label class="est-label" style="margin-top:14px">Vehicle weight (lbs)</label>
+          <input class="est-input" type="number" id="est-weight" placeholder="e.g. 3200" oninput="calcEstimate()">
+        </div>
+
+        <!-- Extras & deductions -->
+        <div class="est-card">
+          <h4>Extras & Deductions</h4>
+          <div class="est-checks">
+            <label class="est-check">
+              <input type="checkbox" id="est-battery" onchange="calcEstimate()">
+              <span class="est-check-label">Has battery <span class="est-check-pill pill-add">+$10</span></span>
+            </label>
+            <label class="est-check">
+              <input type="checkbox" id="est-rims" onchange="calcEstimate()">
+              <span class="est-check-label">4 aluminum rims <span class="est-check-pill pill-add">+$80</span></span>
+            </label>
+            <label class="est-check">
+              <input type="checkbox" id="est-no-engine" onchange="toggleEngineWeight()">
+              <span class="est-check-label">Missing engine <span class="est-check-pill pill-sub">−$40 + weight</span></span>
+            </label>
+          </div>
+          <div id="est-engine-wrap" style="display:none;margin-top:12px">
+            <label class="est-label">Engine weight (lbs)</label>
+            <input class="est-input" type="number" id="est-engine-weight" placeholder="e.g. 450" oninput="calcEstimate()">
+          </div>
+          <div style="margin-top:12px">
+            <label class="est-check">
+              <input type="checkbox" id="est-aftermarket" onchange="calcEstimate()">
+              <span class="est-check-label">Aftermarket/no cat <span class="est-check-pill pill-sub">cat = $0</span></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Breakdown -->
+        <div class="est-result">
+          <h4>Breakdown</h4>
+          <div id="est-breakdown"><p class="est-empty">Enter vehicle weight to see estimate.</p></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: SCRIPT + NOTES -->
+      <div>
+        <!-- Sales script -->
+        <div class="est-card">
+          <h4>Sales Script — Nick from CarInCash</h4>
+          <div class="script-intro" id="script-intro">
+            "Hello! It's <strong>Nick from CarInCash</strong>. You requested an estimate for your <strong id="script-car-name">vehicle</strong>. Do you have 2 minutes of your time?"
+          </div>
+          <div class="q-step" id="q-step"></div>
+        </div>
+
+        <!-- Notes -->
+        <div class="est-card">
+          <h4>Client Notes</h4>
+          <textarea class="notes-area" id="client-notes" placeholder="Write notes about this client here — name, phone, what they said, follow-up reminders…" oninput="saveNotes()"></textarea>
+          <div class="notes-saved" id="notes-saved"></div>
+        </div>
+      </div>
+
+    </div>
   </div>
-</div>
+</div><!-- /.app -->
 
+<!-- ADD CAR MODAL -->
 <div class="modal-bg" id="modal">
   <div class="modal">
     <h3>Add a car</h3>
@@ -150,11 +355,14 @@ td.td-notes{text-align:left;white-space:normal;min-width:110px;font-size:11px;co
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+const SUPABASE_URL = 'https://mxwcqczsuuiqcmuqhwrn.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Ad4RF_2b6QGEcrq_Dt9hHQ_TT5TaWtj';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const TROY = 31.1035;
-const CATS_KEY = 'pgm-cars-v2';
-const PRICES_KEY = 'pgm-prices-v2';
-const CATS = [
+const CATS_TABS = [
   {id:'all',label:'All'},
   {id:'top',label:'🔥 Top tier'},
   {id:'strong',label:'🟡 Strong'},
@@ -162,204 +370,134 @@ const CATS = [
   {id:'low',label:'⚪ Low'},
   {id:'diesel',label:'⛽ Diesel'},
 ];
-const TAG_MAP = {top:'tag-top',hybrid:'tag-hybrid',truck:'tag-truck',euro:'tag-euro',perf:'tag-perf',diesel:'tag-diesel'};
+const TAG_MAP   = {top:'tag-top',hybrid:'tag-hybrid',truck:'tag-truck',euro:'tag-euro',perf:'tag-perf',diesel:'tag-diesel'};
 const TAG_LABEL = {top:'Supercar',hybrid:'Hybrid',truck:'Heavy Truck',euro:'Euro',perf:'Performance',diesel:'Diesel'};
-const CAT_MAP = {top:'top',strong:'strong',average:'average',small:'low',low:'low',diesel:'diesel',ev:'low'};
 
-const DEFAULT_CARS = [
-  {id:1,name:'Ferrari F430',sub:'V8 · 2 cats',cats:2,ptG:8,pdG:6,rhG:3,tags:['top'],tier:'top',notes:'Highest scrap cat ever'},
-  {id:2,name:'Lamborghini Aventador',sub:'V12 6.5L · 2 cats',cats:2,ptG:7,pdG:6,rhG:2.5,tags:['top'],tier:'top',notes:'Rare but worth a lot'},
-  {id:3,name:'Toyota Land Cruiser',sub:'V8 · large SUV',cats:2,ptG:6,pdG:5,rhG:2,tags:[],tier:'top',notes:'Very popular in Canada'},
-  {id:4,name:'Ram 2500 / 3500',sub:'Heavy duty V8',cats:1,ptG:6,pdG:5,rhG:2,tags:['truck'],tier:'top',notes:'High theft target'},
-  {id:5,name:'Ford F-250 / F-350 Super Duty',sub:'Torpedo-style cat',cats:2,ptG:6,pdG:4,rhG:2,tags:['truck'],tier:'top',notes:'Torpedo cats = $820 each'},
-  {id:6,name:'Toyota Prius',sub:'All years · hybrid',cats:1,ptG:5,pdG:6,rhG:2,tags:['hybrid'],tier:'top',notes:'Most stolen in Canada'},
-  {id:7,name:'Toyota Tundra',sub:'V8 pickup · sits high',cats:3,ptG:5,pdG:4,rhG:1.5,tags:[],tier:'top',notes:'4-cat models very valuable'},
-  {id:8,name:'Porsche Cayenne / Panamera',sub:'V6/V8 · Euro6',cats:2,ptG:4,pdG:4,rhG:2,tags:['euro'],tier:'strong',notes:'Euro6 = premium loading'},
-  {id:9,name:'BMW X5 / X7',sub:'3.0L or V8 luxury SUV',cats:2,ptG:4,pdG:4,rhG:1.5,tags:['euro'],tier:'strong',notes:''},
-  {id:10,name:'Mercedes-Benz GLE / E-Class',sub:'V6 or inline-6',cats:2,ptG:4,pdG:3.5,rhG:1.5,tags:['euro'],tier:'strong',notes:''},
-  {id:11,name:'Toyota RAV4 Hybrid',sub:'2019+ · hybrid system',cats:1,ptG:4,pdG:5,rhG:2,tags:['hybrid'],tier:'strong',notes:'Hybrid = much more than gas RAV4'},
-  {id:12,name:'Ford F-150 V8 5.0L',sub:'#1 selling in Canada',cats:2,ptG:5,pdG:4,rhG:1.5,tags:['truck'],tier:'strong',notes:'V6 EcoBoost = less'},
-  {id:13,name:'Chevrolet Silverado 1500 V8 5.3L',sub:'Two cats on V8',cats:2,ptG:4,pdG:3.5,rhG:1.5,tags:[],tier:'strong',notes:'High theft — 2 cats visible'},
-  {id:14,name:'GMC Sierra 1500 / 2500',sub:'Same platform as Silverado',cats:2,ptG:4,pdG:3.5,rhG:1.5,tags:[],tier:'strong',notes:''},
-  {id:15,name:'Chevrolet Tahoe / GMC Yukon',sub:'Full-size V8 SUV',cats:2,ptG:4,pdG:3.5,rhG:1.5,tags:[],tier:'strong',notes:''},
-  {id:16,name:'Toyota 4Runner',sub:'V6 · truck platform',cats:2,ptG:4,pdG:3,rhG:1.5,tags:[],tier:'strong',notes:''},
-  {id:17,name:'Jeep Grand Cherokee V8 5.7L',sub:'Hemi engine',cats:2,ptG:4,pdG:3,rhG:1.5,tags:[],tier:'strong',notes:'V6 = much less'},
-  {id:18,name:'Ford Mustang GT V8',sub:'5.0L Coyote',cats:2,ptG:4,pdG:3,rhG:1.5,tags:['perf'],tier:'strong',notes:'V6 Mustang = $100–180'},
-  {id:19,name:'Dodge Charger / Challenger V8',sub:'5.7L or 6.4L Hemi',cats:2,ptG:4,pdG:3,rhG:1.5,tags:['perf'],tier:'strong',notes:''},
-  {id:20,name:'Ford Expedition',sub:'V8 full-size SUV',cats:2,ptG:4,pdG:3,rhG:1.5,tags:[],tier:'strong',notes:''},
-  {id:21,name:'Ford Escape Hybrid',sub:'2.5L hybrid',cats:1,ptG:3,pdG:4,rhG:1.5,tags:['hybrid'],tier:'strong',notes:''},
-  {id:22,name:'Honda CR-V',sub:'2.0L / 1.5T · most popular SUV',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
-  {id:23,name:'Toyota RAV4 (gas)',sub:'2.5L · #1 SUV in Canada',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:'Hybrid version = 2× more'},
-  {id:24,name:'Toyota Camry V6',sub:'3.5L',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:'4-cyl = lower'},
-  {id:25,name:'Honda Accord V6',sub:'3.5L',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
-  {id:26,name:'Dodge Grand Caravan / Chrysler',sub:'3.6L V6 · very common',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
-  {id:27,name:'Honda Odyssey',sub:'V6 minivan',cats:1,ptG:3,pdG:3.5,rhG:1,tags:[],tier:'average',notes:''},
-  {id:28,name:'Ford Explorer V6 3.5L',sub:'Mid-size SUV',cats:2,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:'Varies a lot by year'},
-  {id:29,name:'Jeep Wrangler V6',sub:'3.6L Pentastar',cats:1,ptG:3,pdG:2.5,rhG:1,tags:[],tier:'average',notes:''},
-  {id:30,name:'Mazda CX-5 / Mazda 3',sub:'Skyactiv 2.0 / 2.5L',cats:1,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
-  {id:31,name:'Hyundai Santa Fe / Tucson',sub:'2.0L / 2.5L GDI',cats:1,ptG:2.5,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
-  {id:32,name:'Kia Sorento / Sportage',sub:'Same platform as Hyundai',cats:1,ptG:2.5,pdG:3,rhG:1,tags:[],tier:'average',notes:''},
-  {id:33,name:'Nissan Rogue / Murano',sub:'2.5L / 3.5L',cats:1,ptG:2.5,pdG:2.5,rhG:1,tags:[],tier:'average',notes:''},
-  {id:34,name:'Subaru Outback / Forester',sub:'Boxer 2.5L',cats:1,ptG:2.5,pdG:2.5,rhG:1,tags:[],tier:'average',notes:'Boxer = slightly less efficient'},
-  {id:35,name:'Chevrolet Equinox / GMC Terrain',sub:'1.5T / 2.0T compact SUV',cats:1,ptG:2.5,pdG:2.5,rhG:0.8,tags:[],tier:'average',notes:''},
-  {id:36,name:'Nissan Altima / Sentra',sub:'2.0L / 2.5L sedan',cats:1,ptG:2.5,pdG:2.5,rhG:0.8,tags:[],tier:'average',notes:''},
-  {id:37,name:'Ford F-150 EcoBoost V6',sub:'2.7L / 3.5L EcoBoost',cats:2,ptG:3,pdG:3,rhG:1,tags:[],tier:'average',notes:'Less than V8 version'},
-  {id:38,name:'Honda Civic / Honda Fit',sub:'1.5T / 1.5L small',cats:1,ptG:2,pdG:2,rhG:0.5,tags:[],tier:'low',notes:'Most common car in Canada'},
-  {id:39,name:'Toyota Corolla',sub:'2.0L',cats:1,ptG:2,pdG:2,rhG:0.5,tags:[],tier:'low',notes:''},
-  {id:40,name:'Hyundai Elantra / Kia Forte',sub:'2.0L entry sedan',cats:1,ptG:2,pdG:2,rhG:0.4,tags:[],tier:'low',notes:''},
-  {id:41,name:'VW Jetta / Golf TDI',sub:'Diesel · no Rh',cats:1,ptG:3,pdG:1,rhG:0,tags:['diesel'],tier:'diesel',notes:'Zero rhodium in diesel'},
-  {id:42,name:'BMW 3 Series diesel',sub:'320d / 330d',cats:1,ptG:3.5,pdG:1,rhG:0,tags:['diesel'],tier:'diesel',notes:'Despite BMW name — no Rh'},
-  {id:43,name:'Any EV (Tesla / Bolt / Leaf)',sub:'No combustion engine',cats:0,ptG:0,pdG:0,rhG:0,tags:[],tier:'low',notes:'Nothing to sell'},
-  {id:44,name:'Aftermarket / universal cat',sub:'Any car · replacement part',cats:1,ptG:0.3,pdG:0.2,rhG:0.05,tags:[],tier:'low',notes:'~10% of OEM content'},
-];
-
-let cars = [];
-let prices = {ptOz:2002, pdOz:1514, rhOz:9650};
-let searchQ = '';
+let cars      = [];
+let prices    = {ptOz:0, pdOz:0, rhOz:0};
+let searchQ   = '';
 let activeTab = 'all';
-let nextId = 100;
 
-function pgram(oz){ return oz/TROY; }
-function fmt(n){ return '$'+Math.round(n).toLocaleString(); }
-function fmtG(g){ return parseFloat(g).toFixed(1)+'g'; }
+/* ── helpers ── */
+function pgram(oz){ return oz / TROY; }
+function fmt(n){ return '$' + Math.round(n).toLocaleString(); }
+function fmtG(g){ return parseFloat(g).toFixed(1) + 'g'; }
 
-function calcRow(c){
-  const pt=pgram(prices.ptOz), pd=pgram(prices.pdOz), rh=pgram(prices.rhOz);
-  const ptD=c.ptG*pt, pdD=c.pdG*pd, rhD=c.rhG*rh;
-  const perCat=ptD+pdD+rhD;
-  const allCats=perCat*c.cats;
-  const payLo=Math.round(allCats*0.50), payHi=Math.round(allCats*0.65);
-  return {pt,pd,rh,ptD,pdD,rhD,perCat,allCats,payLo,payHi};
+function calcRow(c) {
+  const pt = pgram(prices.ptOz), pd = pgram(prices.pdOz), rh = pgram(prices.rhOz);
+  const ptD = c.ptG*pt, pdD = c.pdG*pd, rhD = c.rhG*rh;
+  const perCat = ptD+pdD+rhD;
+  const allCats = perCat * c.cats;
+  return {ptD, pdD, rhD, perCat, allCats,
+    payLo: Math.round(allCats*0.50), payHi: Math.round(allCats*0.65)};
 }
 
-function tierToSection(t){
-  if(t==='top') return '🔥 Top tier — supercars & heavy trucks';
-  if(t==='strong') return '🟡 Strong — $250–500 per cat';
-  if(t==='average') return '🔵 Average — $100–250 per cat';
-  if(t==='low') return '⚪ Low tier';
-  if(t==='diesel') return '⛽ Diesel — no rhodium';
-  return '';
+function tierLabel(t) {
+  return t==='top'?'🔥 Top tier — supercars & heavy trucks'
+       : t==='strong'?'🟡 Strong — $250–500 per cat'
+       : t==='average'?'🔵 Average — $100–250 per cat'
+       : t==='low'?'⚪ Low tier'
+       : t==='diesel'?'⛽ Diesel — no rhodium' : '';
 }
 
-function render(){
-  const pt=pgram(prices.ptOz), pd=pgram(prices.pdOz), rh=pgram(prices.rhOz);
-  document.getElementById('pt-oz').textContent='$'+Math.round(prices.ptOz)+'/troy oz';
-  document.getElementById('pd-oz').textContent='$'+Math.round(prices.pdOz)+'/troy oz';
-  document.getElementById('rh-oz').textContent='$'+Math.round(prices.rhOz)+'/troy oz';
-  document.getElementById('pt-g').innerHTML='$'+pt.toFixed(2)+'<span>/gram</span>';
-  document.getElementById('pd-g').innerHTML='$'+pd.toFixed(2)+'<span>/gram</span>';
-  document.getElementById('rh-g').innerHTML='$'+rh.toFixed(2)+'<span>/gram</span>';
+/* ── tab switching ── */
+function switchTab(tab) {
+  document.getElementById('page-tracker').style.display   = tab==='tracker'   ? '' : 'none';
+  document.getElementById('page-estimator').style.display = tab==='estimator' ? '' : 'none';
+  document.getElementById('tab-btn-tracker').classList.toggle('active',   tab==='tracker');
+  document.getElementById('tab-btn-estimator').classList.toggle('active', tab==='estimator');
+}
 
-  // Tabs
-  const tabsEl=document.getElementById('cat-tabs');
-  tabsEl.innerHTML=CATS.map(c=>`<button class="cat-btn${activeTab===c.id?' active':''}" onclick="setTab('${c.id}')">${c.label}</button>`).join('');
+/* ══════════════════════════════════════════════════════════
+   TRACKER
+══════════════════════════════════════════════════════════ */
+function render() {
+  const pt = pgram(prices.ptOz), pd = pgram(prices.pdOz), rh = pgram(prices.rhOz);
+  document.getElementById('pt-oz').textContent = '$'+Math.round(prices.ptOz)+'/troy oz';
+  document.getElementById('pd-oz').textContent = '$'+Math.round(prices.pdOz)+'/troy oz';
+  document.getElementById('rh-oz').textContent = '$'+Math.round(prices.rhOz)+'/troy oz';
+  document.getElementById('pt-g').innerHTML = '$'+pt.toFixed(2)+'<span>/gram</span>';
+  document.getElementById('pd-g').innerHTML = '$'+pd.toFixed(2)+'<span>/gram</span>';
+  document.getElementById('rh-g').innerHTML = '$'+rh.toFixed(2)+'<span>/gram</span>';
 
-  // Filter
-  let filtered=cars.filter(c=>{
-    const q=searchQ.toLowerCase();
-    const match=!q||c.name.toLowerCase().includes(q)||(c.sub||'').toLowerCase().includes(q)||(c.notes||'').toLowerCase().includes(q);
-    const tabMatch=activeTab==='all'||c.tier===activeTab;
-    return match&&tabMatch;
+  document.getElementById('cat-tabs').innerHTML = CATS_TABS.map(c =>
+    `<button class="cat-btn${activeTab===c.id?' active':''}" onclick="setTab('${c.id}')">${c.label}</button>`
+  ).join('');
+
+  let filtered = cars.filter(c => {
+    const q = searchQ.toLowerCase();
+    const match = !q || c.name.toLowerCase().includes(q) || (c.sub||'').toLowerCase().includes(q) || (c.notes||'').toLowerCase().includes(q);
+    return match && (activeTab==='all' || c.tier===activeTab);
   });
 
-  document.getElementById('count').textContent=filtered.length+' vehicle'+(filtered.length!==1?'s':'');
+  document.getElementById('count').textContent = filtered.length+' vehicle'+(filtered.length!==1?'s':'');
 
-  // Group by tier
-  const tiers=['top','strong','average','low','diesel'];
-  const tbody=document.getElementById('tbody');
-  if(!filtered.length){
-    tbody.innerHTML=`<tr><td colspan="13" class="empty">No vehicles found. Try a different search or add one with AI.</td></tr>`;
+  const tiers = ['top','strong','average','low','diesel'];
+  const tbody = document.getElementById('tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="13" class="empty">No vehicles found.</td></tr>`;
     return;
   }
-  let html='';
-  let lastTier='';
-  tiers.forEach(tier=>{
-    const rows=filtered.filter(c=>c.tier===tier);
-    if(!rows.length) return;
-    if(tier!==lastTier){
-      html+=`<tr class="sec-row"><td colspan="13">${tierToSection(tier)}</td></tr>`;
-      lastTier=tier;
-    }
-    rows.forEach(c=>{
-      const r=calcRow(c);
-      const tags=(c.tags||[]).map(t=>`<span class="tag ${TAG_MAP[t]||''}">${TAG_LABEL[t]||t}</span>`).join('');
-      const catsLabel=c.cats===0?'—':c.cats===1?'×1':'×'+c.cats;
-      const payStr=c.cats===0?'$0':fmt(r.payLo)+'–'+fmt(r.payHi);
-      const totalAllStr=c.cats===0?'$0':fmt(r.allCats);
-      const perCatStr=c.cats===0?'$0':fmt(r.perCat);
-      html+=`<tr>
+  let html = '', lastTier = '';
+  tiers.forEach(tier => {
+    const rows = filtered.filter(c => c.tier===tier);
+    if (!rows.length) return;
+    if (tier !== lastTier) { html += `<tr class="sec-row"><td colspan="13">${tierLabel(tier)}</td></tr>`; lastTier=tier; }
+    rows.forEach(c => {
+      const r = calcRow(c);
+      const tags = (c.tags||[]).map(t => `<span class="tag ${TAG_MAP[t]||''}">${TAG_LABEL[t]||t}</span>`).join('');
+      const catsLabel = c.cats===0?'—':c.cats===1?'×1':'×'+c.cats;
+      const payStr    = c.cats===0?'$0':fmt(r.payLo)+'–'+fmt(r.payHi);
+      const allStr    = c.cats===0?'$0':fmt(r.allCats);
+      const perStr    = c.cats===0?'$0':fmt(r.perCat);
+      html += `<tr>
         <td class="td-l"><div class="car-name">${c.name}${tags}</div><div class="car-sub">${c.sub||''}</div></td>
         <td class="td-c">${catsLabel}</td>
         <td><span class="val-g">${fmtG(c.ptG)}</span></td><td><span class="val-d">${fmt(r.ptD)}</span></td>
         <td><span class="val-g">${fmtG(c.pdG)}</span></td><td><span class="val-d">${fmt(r.pdD)}</span></td>
         <td><span class="val-g">${fmtG(c.rhG)}</span></td><td><span class="val-d">${fmt(r.rhD)}</span></td>
-        <td><span class="val-total">${perCatStr}</span></td>
-        <td><span class="val-all">${totalAllStr}</span></td>
+        <td><span class="val-total">${perStr}</span></td>
+        <td><span class="val-all">${allStr}</span></td>
         <td class="td-l"><span class="val-pay">${payStr}</span></td>
         <td class="td-notes">${c.notes||''}</td>
         <td><button class="btn-del" onclick="deleteCar(${c.id})">✕</button></td>
       </tr>`;
     });
   });
-  tbody.innerHTML=html;
+  tbody.innerHTML = html;
 }
 
 function setTab(t){ activeTab=t; render(); }
 function onSearch(v){ searchQ=v; render(); }
 
-async function loadData(){
-  try{
-    const cr=await window.storage.get(CARS_KEY);
-    if(cr&&cr.value) cars=JSON.parse(cr.value);
-    else cars=[...DEFAULT_CARS];
-  }catch(e){ cars=[...DEFAULT_CARS]; }
-  try{
-    const pr=await window.storage.get(PRICES_KEY);
-    if(pr&&pr.value){ const p=JSON.parse(pr.value); prices={...prices,...p}; }
-  }catch(e){}
-  nextId=Math.max(...cars.map(c=>c.id),99)+1;
-  const d=new Date();
-  document.getElementById('updated').textContent='Last updated: '+d.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
+async function loadCars() {
+  const { data } = await sb.from('cars').select('*').order('created_at', {ascending:true});
+  cars = (data||[]).map(c => ({
+    id:c.id, name:c.name, sub:c.sub||'', cats:c.cats,
+    ptG:c.pt_g, pdG:c.pd_g, rhG:c.rh_g,
+    tags:c.tags||[], tier:c.tier||'average', notes:c.notes||''
+  }));
   render();
 }
 
-async function saveData(){
-  try{ await window.storage.set(CARS_KEY,JSON.stringify(cars)); }catch(e){}
-}
-
-async function savePrices(){
-  try{ await window.storage.set(PRICES_KEY,JSON.stringify(prices)); }catch(e){}
-}
-
-async function refreshPrices(){
-  const btn=document.getElementById('btn-refresh');
-  const icon=document.getElementById('refresh-icon');
-  btn.classList.add('loading');
-  icon.textContent='…';
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:500,
-        tools:[{type:'web_search_20250305',name:'web_search'}],
-        messages:[{role:'user',content:'Search for current spot prices today for platinum, palladium, and rhodium in USD per troy ounce from kitco.com or similar. Respond with ONLY a raw JSON object and nothing else, no markdown, no explanation: {"ptOz":2002,"pdOz":1514,"rhOz":9650} — replace the numbers with today\'s actual prices.'}]
-      })
-    });
-    const data=await res.json();
-    const texts=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
-    const match=texts.match(/\{[^}]*"ptOz"[^}]*\}/);
-    if(match){
-      const p=JSON.parse(match[0]);
-      if(p.ptOz&&p.pdOz&&p.rhOz){ prices={...prices,...p}; await savePrices(); }
-    }
-    const d=new Date();
-    document.getElementById('updated').textContent='Updated: '+d.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'})+' '+d.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
-  }catch(e){ console.error(e); }
-  btn.classList.remove('loading');
-  icon.textContent='↻';
+async function refreshPrices() {
+  const btn = document.getElementById('btn-refresh');
+  const icon = document.getElementById('refresh-icon');
+  btn.classList.add('loading'); icon.textContent='…';
+  try {
+    const res = await fetch('/api/prices');
+    const data = await res.json();
+    if (data.ptOz && data.pdOz && data.rhOz) prices = data;
+    const d = new Date();
+    document.getElementById('updated').textContent =
+      'Updated: '+d.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'})+
+      ' '+d.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
+  } catch(e) {
+    document.getElementById('updated').textContent = 'Price update failed';
+  }
+  btn.classList.remove('loading'); icon.textContent='↻';
   render();
+  calcEstimate(); // update estimator cat values with fresh prices
 }
 
 function openModal(){
@@ -372,51 +510,270 @@ function openModal(){
 }
 function closeModal(){ document.getElementById('modal').classList.remove('open'); }
 
-async function addCar(){
-  const name=document.getElementById('car-input').value.trim();
-  if(!name) return;
-  const st=document.getElementById('modal-status');
-  const btn=document.getElementById('btn-go');
-  btn.disabled=true;
-  st.textContent='Looking up metal content…';
-  st.className='status';
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:600,
-        messages:[{role:'user',content:`Provide catalytic converter PGM data for: "${name}". Return ONLY a raw JSON object, no markdown, no explanation:\n{"name":"full car name","sub":"engine info","cats":1,"ptG":3.0,"pdG":3.0,"rhG":1.0,"tags":["hybrid"],"tier":"average","notes":"short note"}\ntier must be one of: top, strong, average, low, diesel\ntags array can include zero or more of: hybrid, truck, euro, perf, top, diesel\nptG/pdG/rhG are average grams of Pt/Pd/Rh in one catalytic converter unit.\nDiesel vehicles have rhG=0. EVs have all zeros and cats=0.`}]
-      })
-    });
-    const data=await res.json();
-    const text=data.content.find(b=>b.type==='text')?.text||'';
-    const match=text.match(/\{[\s\S]*?\}/);
-    if(!match) throw new Error('No data returned');
-    const car=JSON.parse(match[0]);
-    car.id=nextId++;
-    if(!car.tier) car.tier='average';
-    cars.push(car);
-    await saveData();
-    st.textContent='✓ Added: '+car.name;
-    st.className='status ok';
-    render();
-    setTimeout(closeModal,1200);
-  }catch(e){
-    st.textContent='Could not find data for that vehicle. Try being more specific (year, make, model).';
-    st.className='status err';
-    btn.disabled=false;
+async function addCar() {
+  const name = document.getElementById('car-input').value.trim();
+  if (!name) return;
+  const st = document.getElementById('modal-status');
+  const btn = document.getElementById('btn-go');
+  btn.disabled=true; st.textContent='Looking up metal content…'; st.className='status';
+  try {
+    const res = await fetch('/api/lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({carName:name})});
+    if (!res.ok) throw new Error();
+    const car = await res.json();
+    if (car.error) throw new Error();
+    const {data,error} = await sb.from('cars').insert({
+      name:car.name, sub:car.sub||'', cats:car.cats||1,
+      pt_g:car.ptG||0, pd_g:car.pdG||0, rh_g:car.rhG||0,
+      tags:car.tags||[], tier:car.tier||'average', notes:car.notes||''
+    }).select().single();
+    if (error) throw error;
+    cars.push({id:data.id,name:data.name,sub:data.sub,cats:data.cats,ptG:data.pt_g,pdG:data.pd_g,rhG:data.rh_g,tags:data.tags||[],tier:data.tier,notes:data.notes});
+    st.textContent='✓ Added: '+data.name; st.className='status ok';
+    render(); setTimeout(closeModal,1200);
+  } catch(e) {
+    st.textContent='Could not find data. Try being more specific (year, make, model).';
+    st.className='status err'; btn.disabled=false;
   }
 }
 
-async function deleteCar(id){
-  cars=cars.filter(c=>c.id!==id);
-  await saveData();
-  render();
+async function deleteCar(id) {
+  const {error} = await sb.from('cars').delete().eq('id',id);
+  if (!error) { cars=cars.filter(c=>c.id!==id); render(); }
 }
 
-document.getElementById('modal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href='/login.html';
+}
 
-loadData();
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+
+/* ══════════════════════════════════════════════════════════
+   ESTIMATOR
+══════════════════════════════════════════════════════════ */
+let estCatValue = 180;   // default $180
+let estCatLabel = 'Average (no car selected)';
+let estCarObj   = null;  // matched car from DB
+
+/* ── car search ── */
+function estCarSearch(val) {
+  const dd = document.getElementById('est-dropdown');
+  const q  = val.toLowerCase().trim();
+  if (!q || q.length < 2) { dd.classList.remove('open'); return; }
+
+  const results = cars
+    .filter(c => c.name.toLowerCase().includes(q) || (c.sub||'').toLowerCase().includes(q))
+    .slice(0, 6);
+
+  if (!results.length) { dd.classList.remove('open'); return; }
+
+  dd.innerHTML = results.map(c => {
+    const r = calcRow(c);
+    const val = c.cats===0 ? '$0' : fmt(r.payLo)+'–'+fmt(r.payHi);
+    return `<div class="est-drop-item" onclick="selectEstCar(${c.id})">
+      <span class="est-drop-val">${val}</span>
+      <div class="est-drop-name">${c.name}</div>
+      <div class="est-drop-sub">${c.sub||''}</div>
+    </div>`;
+  }).join('');
+  dd.classList.add('open');
+}
+
+function selectEstCar(id) {
+  estCarObj = cars.find(c => c.id===id);
+  document.getElementById('est-dropdown').classList.remove('open');
+  if (!estCarObj) return;
+  document.getElementById('est-car').value = estCarObj.name;
+  document.getElementById('script-car-name').textContent = estCarObj.name;
+
+  const r = calcRow(estCarObj);
+  if (estCarObj.cats === 0) {
+    estCatValue = 0;
+    estCatLabel = estCarObj.name + ' (EV — no cat)';
+  } else {
+    estCatValue = r.payLo;
+    estCatLabel = estCarObj.name;
+  }
+  updateCatBadge();
+  calcEstimate();
+}
+
+function updateCatBadge() {
+  const aftermarket = document.getElementById('est-aftermarket').checked;
+  const badge = document.getElementById('est-cat-badge');
+  const nameEl = document.getElementById('est-cat-name');
+  const valEl  = document.getElementById('est-cat-val');
+
+  if (aftermarket) {
+    badge.className='est-cat-badge';
+    nameEl.textContent='Aftermarket cat — no value';
+    valEl.textContent='$0';
+    return;
+  }
+  if (estCarObj) {
+    badge.className='est-cat-badge found';
+    nameEl.textContent=estCatLabel;
+    valEl.textContent=fmt(estCatValue);
+  } else {
+    badge.className='est-cat-badge';
+    nameEl.textContent='No car selected — using $180 average';
+    valEl.textContent='$180';
+  }
+}
+
+function toggleEngineWeight() {
+  const show = document.getElementById('est-no-engine').checked;
+  document.getElementById('est-engine-wrap').style.display = show ? '' : 'none';
+  calcEstimate();
+}
+
+/* ── main calc ── */
+function calcEstimate() {
+  updateCatBadge();
+  const weight       = parseFloat(document.getElementById('est-weight').value) || 0;
+  const hasBattery   = document.getElementById('est-battery').checked;
+  const hasRims      = document.getElementById('est-rims').checked;
+  const noEngine     = document.getElementById('est-no-engine').checked;
+  const aftermarket  = document.getElementById('est-aftermarket').checked;
+  const engineWeight = parseFloat(document.getElementById('est-engine-weight').value) || 0;
+
+  const catVal = aftermarket ? 0 : (estCarObj ? estCatValue : 180);
+  const catLabel = aftermarket ? 'Aftermarket cat'
+                 : estCarObj   ? estCarObj.name
+                 : 'Average cat (no car selected)';
+
+  if (!weight) {
+    document.getElementById('est-breakdown').innerHTML = '<p class="est-empty">Enter vehicle weight to see estimate.</p>';
+    return;
+  }
+
+  const tireDeduct   = 150;
+  const engDeduct    = noEngine ? engineWeight : 0;
+  const netWeight    = weight - tireDeduct - engDeduct;
+  const scrapVal     = netWeight * 0.135;
+  const batteryVal   = hasBattery ? 10 : 0;
+  const rimsVal      = hasRims ? 80 : 0;
+  const engPenalty   = noEngine ? -40 : 0;
+  const total        = scrapVal + batteryVal + rimsVal + engPenalty + catVal;
+
+  const li = (label, val, cls='') =>
+    `<div class="est-line ${cls}"><span>${label}</span><span>${val}</span></div>`;
+
+  let html = '';
+  html += li('Vehicle weight', weight.toLocaleString()+' lbs', 'weight');
+  html += li('− Tires (always)', '−'+tireDeduct+' lbs', 'deduct');
+  if (noEngine && engineWeight) html += li('− Missing engine', '−'+engineWeight+' lbs', 'deduct');
+  html += li('Net scrap weight', Math.max(0,netWeight).toLocaleString()+' lbs', 'weight');
+  html += li('× $0.135 / lb', fmt(Math.max(0,scrapVal)));
+  html += '<hr class="est-divider">';
+  if (hasBattery) html += li('Battery', '+$10', 'add');
+  if (hasRims)    html += li('Aluminum rims × 4', '+$80', 'add');
+  if (noEngine)   html += li('Missing engine penalty', '−$40', 'deduct');
+  html += li('Cat — '+catLabel, (catVal>0?'+':'')+fmt(catVal), catVal>0?'add':catVal<0?'deduct':'');
+  html += '<hr class="est-divider">';
+  html += `<div class="est-total">
+    <span class="est-total-label">Estimated offer</span>
+    <span class="est-total-val">${fmt(Math.max(0,total))}</span>
+  </div>`;
+
+  document.getElementById('est-breakdown').innerHTML = html;
+}
+
+/* ── close dropdown on outside click ── */
+document.addEventListener('click', e => {
+  if (!e.target.closest('.est-search-wrap'))
+    document.getElementById('est-dropdown').classList.remove('open');
+});
+
+/* ══════════════════════════════════════════════════════════
+   SALES SCRIPT — step-through questions
+══════════════════════════════════════════════════════════ */
+const QUESTIONS = [
+  'What\'s the mileage on the vehicle?',
+  'Does the car start and run?',
+  'Any major mechanical issues we should know about?',
+  'How\'s the body condition? Any rust or accident damage?',
+  'Do you have a clean title for the vehicle?',
+  'What\'s the address where we can pick it up?',
+  'How soon are you looking to sell?',
+];
+let qAnswers = new Array(QUESTIONS.length).fill('');
+let qIndex   = 0;
+let qDone    = false;
+
+function renderQuestion() {
+  const el = document.getElementById('q-step');
+  if (qDone) {
+    const summary = QUESTIONS.map((q,i) => `
+      <div class="q-summary-item">
+        <div class="q-summary-q">${q}</div>
+        <div class="q-summary-a">${qAnswers[i]||'—'}</div>
+      </div>`).join('');
+    el.innerHTML = `
+      <div class="q-num">All questions answered</div>
+      <div class="q-summary">${summary}</div>
+      <div class="q-nav" style="margin-top:14px">
+        <button onclick="restartQ()">Start over</button>
+        <span></span>
+      </div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="q-num">Question ${qIndex+1} of ${QUESTIONS.length}</div>
+    <div class="q-text">${QUESTIONS[qIndex]}</div>
+    <textarea class="q-answer" id="q-answer" placeholder="Client's answer…">${qAnswers[qIndex]}</textarea>
+    <div class="q-nav">
+      <button onclick="prevQ()" ${qIndex===0?'disabled':''}>← Back</button>
+      <button class="btn-next" onclick="nextQ()">${qIndex===QUESTIONS.length-1?'Done ✓':'Next →'}</button>
+    </div>`;
+  document.getElementById('q-answer').focus();
+}
+
+function saveCurrentAnswer() {
+  const el = document.getElementById('q-answer');
+  if (el) qAnswers[qIndex] = el.value;
+}
+function nextQ() {
+  saveCurrentAnswer();
+  if (qIndex < QUESTIONS.length-1) { qIndex++; renderQuestion(); }
+  else { qDone=true; renderQuestion(); }
+}
+function prevQ() {
+  saveCurrentAnswer();
+  if (qIndex > 0) { qIndex--; renderQuestion(); }
+}
+function restartQ() {
+  qAnswers = new Array(QUESTIONS.length).fill('');
+  qIndex=0; qDone=false; renderQuestion();
+}
+
+/* ── Notes (saved to localStorage) ── */
+function saveNotes() {
+  const val = document.getElementById('client-notes').value;
+  localStorage.setItem('pgm-client-notes', val);
+  const s = document.getElementById('notes-saved');
+  s.textContent = 'Saved';
+  clearTimeout(saveNotes._t);
+  saveNotes._t = setTimeout(() => { s.textContent=''; }, 1500);
+}
+function loadNotes() {
+  const val = localStorage.getItem('pgm-client-notes') || '';
+  document.getElementById('client-notes').value = val;
+}
+
+/* ══════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════ */
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href='/login.html'; return; }
+  document.body.style.display = 'block';
+  renderQuestion();
+  loadNotes();
+  await loadCars();
+  await refreshPrices();
+})();
 </script>
+</body>
+</html>

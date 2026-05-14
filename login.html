@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PGM Cat Tracker — Login</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',sans-serif;background:#0f0f0f;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.box{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:36px;width:min(380px,100%)}
+.logo{font-size:18px;font-weight:600;color:#fff;margin-bottom:6px}
+.logo span{color:#D85A30;font-family:'IBM Plex Mono',monospace}
+.sub{font-size:12px;color:#666;margin-bottom:28px}
+label{display:block;font-size:11px;font-weight:500;color:#888;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+input{width:100%;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:11px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;color:#fff;outline:none;margin-bottom:14px;transition:border .15s}
+input:focus{border-color:#D85A30}
+input::placeholder{color:#444}
+.err{font-size:12px;color:#E24B4A;font-family:'IBM Plex Mono',monospace;min-height:18px;margin-bottom:12px}
+button{width:100%;background:#D85A30;border:none;border-radius:8px;padding:12px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;color:#fff;transition:opacity .15s}
+button:hover{opacity:.88}
+button:disabled{opacity:.5;cursor:not-allowed}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo"><span>PGM</span> Cat Tracker</div>
+  <div class="sub">Private access only — Canada</div>
+  <label>Email</label>
+  <input type="email" id="email" placeholder="your@email.com" autocomplete="email">
+  <label>Password</label>
+  <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+  <div class="err" id="err"></div>
+  <button id="btn" onclick="login()">Sign in</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = 'https://mxwcqczsuuiqcmuqhwrn.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Ad4RF_2b6QGEcrq_Dt9hHQ_TT5TaWtj';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+sb.auth.getSession().then(({ data }) => {
+  if (data.session) window.location.href = '/';
+});
+
+async function login() {
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const err = document.getElementById('err');
+  const btn = document.getElementById('btn');
+  err.textContent = '';
+  if (!email || !password) { err.textContent = 'Enter email and password.'; return; }
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) {
+    err.textContent = 'Wrong email or password.';
+    btn.disabled = false;
+    btn.textContent = 'Sign in';
+  } else {
+    window.location.href = '/';
+  }
+}
+</script>
+</body>
+</html>
